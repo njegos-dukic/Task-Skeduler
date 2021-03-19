@@ -1,6 +1,6 @@
 # Skeduler - Simple Task Scheduler
 
-<img src=".\Logo.png" alt="drawing" width="230"/>
+<img src="..\assets\Logo.png" alt="drawing" width="230"/>
 
 ## ***Description*** 
 
