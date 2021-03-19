@@ -1,0 +1,227 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Skeduler</name>
+    </assembly>
+    <members>
+        <member name="T:OPOS.ConcurrentSortedList`1">
+            <summary>
+            Thread-safe sorted list that allows duplicate keys and sorts them in FIFO order.
+            </summary>
+            <typeparam name="T">Type of items to be stored in the list.</typeparam>
+        </member>
+        <member name="M:OPOS.ConcurrentSortedList`1.Add(System.Int32,`0)">
+            <summary>
+            Adds (Key, Value) pair to the list.
+            </summary>
+            <param name="key">Integer key for sorting.</param>
+            <param name="value">Value associated with the key.</param>
+        </member>
+        <member name="M:OPOS.ConcurrentSortedList`1.GetFirst">
+            <summary>
+            Removes most prioritized (Key, Value) pair.
+            </summary>
+            <returns>Returns removed KVP or null if the list is empty.</returns>
+        </member>
+        <member name="M:OPOS.ConcurrentSortedList`1.GetFirstWithoutRemoving">
+            <summary>
+            Peeks the most prioritized (Key, Value) pair.
+            </summary>
+            <returns>KVP from the top of the list without removing it.</returns>
+        </member>
+        <member name="T:OPOS.DualKeyComparator`1">
+            <summary>
+            Helper class that extends IComparer and redefines Compare to allow duplicate keys and FIFO sorting.
+            </summary>
+            <typeparam name="TKey"></typeparam>
+        </member>
+        <member name="M:OPOS.DualKeyComparator`1.Compare(`0,`0)">
+            <summary>
+            Method for comparing two keys.
+            </summary>
+            <param name="x">First key.</param>
+            <param name="y">Second key.</param>
+            <returns>-1 if keys are equal, treating equality as being smaller, otherwise result of x.CompareTo(y);</returns>
+        </member>
+        <member name="T:OPOS.Skeduler">
+            <summary>
+            Simple .NET CLR Task Scheduler that inherits and redefines System.Threading.Tasks.TaskScheduler.
+            Implemented on.NET Standard 2.0.
+            </summary>
+        </member>
+        <member name="M:OPOS.Skeduler.GetSkeduler(OPOS.SchedulingType,System.Int32,System.Int32)">
+            <summary>
+            Returns and/or creates Singleton instance of Skeduler.
+            </summary>
+            <param name="schedulingType">SchedulingType Enum that represents type of scheduling. Either Preemtpive or NonPreemptive.</param>
+            <param name="totalNumberOfThreads">Number of threads allocated to the scheduler.</param>
+            <param name="schedulingDurationInSeconds">Scheduler level deadline for all arrived tasks.</param>
+            <returns></returns>
+        </member>
+        <member name="M:OPOS.Skeduler.QueueTask(OPOS.TaskMetadata)">
+            <summary>
+            Queues task to the list of pending tasks.
+            </summary>
+            <param name="task">Task to be queued.</param>
+        </member>
+        <member name="M:OPOS.Skeduler.Schedule">
+            <summary>
+            Starts the scheduling of tasks that have been queued.
+            </summary>
+        </member>
+        <member name="M:OPOS.Skeduler.GetQueuedTasks">
+            <summary>
+            Provides insight into the list of currently queued tasks.
+            </summary>
+            <returns>Returns the list of currently queued tasks.</returns>
+        </member>
+        <member name="M:OPOS.Skeduler.GetScheduledTasks">
+            <summary>
+            Provides insight into the list of currently queued tasks.
+            </summary>
+            <returns>List of queued tasks as IEnumerable.</returns>
+        </member>
+        <member name="M:OPOS.Skeduler.QueueTask(System.Threading.Tasks.Task)">
+            <summary>
+            Internally called after Task.Factory.StartNew() or Task.Start().
+            </summary>
+            <param name="task">Task that is being started.</param>
+        </member>
+        <member name="M:OPOS.Skeduler.TryExecuteTaskInline(System.Threading.Tasks.Task,System.Boolean)">
+            <summary>
+            Allows task to be executed on current thread. (Current Synchronization Context)
+            </summary>
+            <param name="task">Task to be inlined.</param>
+            <param name="taskWasPreviouslyQueued">Control variable showing was task previously queued.</param>
+            <returns></returns>
+        </member>
+        <member name="T:OPOS.SchedulingType">
+            <summary>
+            Enum representing type of scheduling to be used, either Preemtpive or Non-Preemptive.
+            </summary>
+        </member>
+        <member name="T:OPOS.TaskMetadata">
+            <summary>
+            Class that encapsulates action, it's associated task, priority, duration as well as cooperative token and list of requested resources.
+            </summary>
+        </member>
+        <member name="P:OPOS.TaskMetadata.Descriptor">
+            <summary>
+            Object describing the task.
+            </summary>
+        </member>
+        <member name="M:OPOS.TaskMetadata.#ctor(System.Action,OPOS.Priority,System.Int32,OPOS.CooperativeToken,System.Object,System.Collections.Generic.List{System.Object})">
+            <summary>
+            Creates new TaskMetadata object.
+            </summary>
+            <param name="action">Action to be executed.</param>
+            <param name="priority">Priority enum of the task.</param>
+            <param name="duration">Duration limit in seconds.</param>
+            <param name="cooperativeToken">Cooperative token used as cooperating mechanism.</param>
+            <param name="descriptor">Descriptor object.</param>
+            <param name="resources">List of objects representing resources that task need.</param>
+        </member>
+        <member name="M:OPOS.TaskMetadata.GetTask">
+            <summary>
+            Grabs task from the TaskMetadata object.
+            </summary>
+            <returns>Task associated with this object.</returns>
+        </member>
+        <member name="M:OPOS.TaskMetadata.SetTask(System.Threading.Tasks.Task)">
+            <summary>
+            Sets the task of this object.
+            </summary>
+            <param name="task">Task to be set.</param>
+        </member>
+        <member name="M:OPOS.TaskMetadata.GetAction">
+            <summary>
+            Grabs the action from the TaskMetadata object.
+            </summary>
+            <returns>Action associated with this object.</returns>
+        </member>
+        <member name="M:OPOS.TaskMetadata.GetPriority">
+            <summary>
+            Grabs the priority from the TaskMetadata object.
+            </summary>
+            <returns>Priority associated with this object.</returns>
+        </member>
+        <member name="M:OPOS.TaskMetadata.SetPriority(OPOS.Priority)">
+            <summary>
+            Sets the priority of this object.
+            </summary>
+            <param name="priority">Priority to be set.</param>
+        </member>
+        <member name="M:OPOS.TaskMetadata.GetCooperativeToken">
+            <summary>
+            Grabs the CooperativeToken from the TaskMetadata object.
+            </summary>
+            <returns>CooperativeToken associated with this object.</returns>
+        </member>
+        <member name="M:OPOS.TaskMetadata.GetResources">
+            <summary>
+            Grabs the Resources from the TaskMetadata object.
+            </summary>
+            <returns>List of resources associated with this object.</returns>
+        </member>
+        <member name="M:OPOS.TaskMetadata.AddWithLowerPriority(OPOS.ConcurrentSortedList{OPOS.TaskMetadata})">
+            <summary>
+            Adds TaskMetadata object to the ConcurrentSortedList with lower priority or to the end of current priority part if it's already at Low.
+            </summary>
+            <param name="list"></param>
+        </member>
+        <member name="T:OPOS.CooperativeToken">
+            <summary>
+            Class representing cooperative mechanism and used for cooperative scheduling.
+            </summary>
+        </member>
+        <member name="M:OPOS.CooperativeToken.#ctor">
+            <summary>
+            Creating new CooperativeToken that is not paused or cancelled.
+            </summary>
+        </member>
+        <member name="M:OPOS.CooperativeToken.IsPauseRequested">
+            <summary>
+            Check is CooperationToken paused.
+            </summary>
+            <returns>true if token is paused, otherwise false.</returns>
+        </member>
+        <member name="M:OPOS.CooperativeToken.IsCancellationRequested">
+            <summary>
+            Check is CooperationToken cancelled.
+            </summary>
+            <returns>true if token is cancelled, otherwise false.</returns>
+        </member>
+        <member name="M:OPOS.CooperativeToken.IsPausedOrCanceled">
+            <summary>
+            Check is CooperationToken paused or cancelled.
+            </summary>
+            <returns>true if token is paused or cancelled, otherwise false.</returns>
+        </member>
+        <member name="M:OPOS.CooperativeToken.Cancel">
+            <summary>
+            Mark this cooperation token as cancelled.
+            </summary>
+        </member>
+        <member name="M:OPOS.CooperativeToken.CancelAfter(System.Int32)">
+            <summary>
+            Mark this CooperationToken as cancelled after duration in seconds.
+            </summary>
+            <param name="seconds">Duration in seconds.</param>
+        </member>
+        <member name="M:OPOS.CooperativeToken.Pause">
+            <summary>
+            Mark this CooperationToken as paused.
+            </summary>
+        </member>
+        <member name="M:OPOS.CooperativeToken.Resume">
+            <summary>
+            Remove pause flag from this CooperationToken.
+            </summary>
+        </member>
+        <member name="T:OPOS.Priority">
+            <summary>
+            Enum representing priority of the task to be scheduled.
+            </summary>
+        </member>
+    </members>
+</doc>
